@@ -1,12 +1,12 @@
 const express = require("express");
 
-const { getReviews } = require("../be-nc-games/controllers/games.js");
+const models = require("../be-nc-games/controllers/games.js");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/api/reviews", getReviews);
+app.get("/api/reviews", models.getReviews);
 
 app.all("/*", (req, res) => {
 	res.status(404).send({ msg: "Route not found" });
