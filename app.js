@@ -7,6 +7,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/reviews", models.getReviews);
+app.get("/api/categories", models.getCategories);
 
 app.all("/*", (req, res) => {
 	res.status(404).send({ msg: "Route not found" });

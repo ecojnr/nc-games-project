@@ -42,3 +42,35 @@ describe("1: GET /api/reviews", () => {
 			});
 	});
 });
+
+describe("2: GET /api/categories", () => {
+	test("The url responds with a status of 200", () => {
+		return request(app).get("/api/categories").expect(200);
+	});
+	test("Responds with a status of 200 and an instance of an array", () => {
+		return request(app)
+			.get("/api/categories")
+			.expect(200)
+			.then(({ body }) => {
+				const { categories } = body;
+				expect(categories).toBeInstanceOf(Array);
+			});
+	});
+	test("status:200, responds with an array of reviews ", () => {
+		return request(app)
+			.get("/api/categories")
+			.expect(200)
+			.then(({ body }) => {
+				const { categories } = body;
+				expect(categories).toBeInstanceOf(Array);
+				categories.forEach((category) => {
+					expect(category).toEqual(
+						expect.objectContaining({
+							slug: expect.any(String),
+							description: expect.any(String),
+						})
+					);
+				});
+			});
+	});
+});
