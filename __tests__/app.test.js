@@ -5,7 +5,7 @@ const db = require("../db/connection");
 afterAll(() => db.end());
 
 describe("1: GET /api/reviews", () => {
-	test("The url responds with a status of 200", () => {
+	test.only("The url responds with a status of 200", () => {
 		return request(app).get("/api/reviews").expect(200);
 	});
 	test("Responds with a status of 200 and an instance of an array", () => {
@@ -31,7 +31,6 @@ describe("1: GET /api/reviews", () => {
 							designer: expect.any(String),
 							owner: expect.any(String),
 							review_img_url: expect.any(String),
-							review_body: expect.any(String),
 							review_id: expect.any(Number),
 							category: expect.any(String),
 							created_at: expect.any(String),
