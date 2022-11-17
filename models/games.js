@@ -10,3 +10,36 @@ exports.selectReviews = () => {
 exports.selectCategories = () => {
   return db.query("SELECT * FROM categories;").then((result) => result.rows);
 };
+
+exports.selectReviewById = (id) => {
+  if (isNaN(id)) {
+    return Promise.reject({
+      status: 400,
+      msg: `Entered ID is not a number: ${id}`,
+    });
+  }
+  return db
+    .query("SELECT * FROM reviews WHERE review_id = $1;", [id])
+    .then((result) => {
+      const review = result.rows[0];
+      if (!review) {
+        return Promise.reject({
+          status: 404,
+          msg: `No review found for review id: ${id}`,
+        });
+      }
+      return review;
+    });
+};
+
+exports.selectCommentsByReview = (id) => {
+  if (isNaN(id)) {
+    return Promise.reject({
+      status: 400,
+      msg: `Entered ID is not a number: ${id}`,
+    });
+  }
+  return db
+    .query("SELECT * FROM comments WHERE review_id = $1;", [id])
+    .then((reviews) => reviews.rows);
+};
