@@ -51,3 +51,56 @@ describe("2: GET /api/categories", () => {
       });
   });
 });
+
+describe("3: GET /api/reviews/review_id", () => {
+  test("status:200, responds with an array of reviews containing correct object values ", () => {
+    const review_id = 1;
+    return request(app)
+      .get(`/api/reviews/${review_id}`)
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toBeInstanceOf(Object);
+        expect(body.review).toEqual({
+          review_id: 1,
+          title: expect.any(String),
+          review_body: expect.any(String),
+          designer: expect.any(String),
+          review_img_url: expect.any(String),
+          votes: expect.any(Number),
+          category: expect.any(String),
+          owner: expect.any(String),
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("status:200, responds with an array of reviews containing correct object values ", () => {
+    return request(app)
+      .get("/api/reviews/85")
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe(`No review found for review id: 85`);
+      });
+  });
+});
+
+describe.only("4: GET /api/:review_id/comments", () => {
+  test("status:200, responds with an array of comments", () => {
+    const review_id = 1;
+    return request(app)
+      .get(`/api/reviews/${review_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        const { categories } = body;
+        expect(categories).toBeInstanceOf(Array);
+        categories.forEach((category) => {
+          expect(category).toEqual(
+            expect.objectContaining({
+              slug: expect.any(String),
+              description: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
