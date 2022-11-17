@@ -16,8 +16,12 @@ app.all("/*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  res.send(err);
-  res.sendStatus(500);
+  if (err.status) {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    console.log(err);
+    res.sendStatus(500);
+  }
 });
 
 module.exports = app;

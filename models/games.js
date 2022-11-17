@@ -19,12 +19,9 @@ exports.selectReviewById = (id) => {
     });
   }
   return db
-    .query(
-      "SELECT users.username as owner, reviews.review_id, title, review_body, designer, review_img_url, reviews.votes, categories.slug AS category, created_at FROM reviews INNER JOIN users ON users.username=reviews.owner INNER JOIN categories ON categories.slug=reviews.category WHERE review_id = $1;",
-      [id]
-    )
-    .then((review) => {
-      review = review.rows[0];
+    .query("SELECT * FROM reviews WHERE review_id = $1;", [id])
+    .then((result) => {
+      const review = result.rows[0];
       if (!review) {
         return Promise.reject({
           status: 404,
@@ -44,14 +41,5 @@ exports.selectCommentsByReview = (id) => {
   }
   return db
     .query("SELECT * FROM comments WHERE review_id = $1;", [id])
-    .then((review) => {
-      review = review.rows[0];
-      if (!review) {
-        return Promise.reject({
-          status: 404,
-          msg: `No comments found for review id: ${id}`,
-        });
-      }
-      return review;
-    });
+    .then((reviews) => reviews.rows);
 };
