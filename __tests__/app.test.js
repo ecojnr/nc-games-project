@@ -94,7 +94,7 @@ describe("3: GET /api/reviews/review_id", () => {
   });
 });
 
-/*describe("4: GET /api/:review_id/comments", () => {
+describe("4: GET /api/:review_id/comments", () => {
   test("status:200, responds with an array of comments", () => {
     const review_id = 1;
     return request(app)
@@ -103,21 +103,36 @@ describe("3: GET /api/reviews/review_id", () => {
       .then(({ body }) => {
         const { comments } = body;
         expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(3);
         comments.forEach((comment) => {
           expect(comment).toEqual(
             expect.objectContaining({
-              title: expect.any(String),
-              designer: expect.any(String),
-              owner: expect.any(String),
-              review_img_url: expect.any(String),
-              review_id: expect.any(Number),
-              category: expect.any(String),
+              body: expect.any(String),
+              review_id: 1,
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              author: expect.any(String),
+              comment_id: expect.any(Number),
             })
           );
         });
       });
   });
-});*/
+  test("status:404, responds with an error stating no review found for given id", () => {
+    const review_id = 400;
+    return request(app)
+      .get(`/api/reviews/${review_id}/comments`)
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe(`No comments found for review_id: 400`);
+      });
+  });
+  test("status:400, responds with an error stating review id is not a number", () => {
+    return request(app)
+      .get("/api/reviews/asdasd/comments")
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(`Entered ID is not a number: asdasd`);
+      });
+  });
+});
