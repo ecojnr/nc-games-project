@@ -77,3 +77,6 @@ exports.insertComment = (newComment) => {
     )
     .then(({ rows }) => rows[0]);
 };
+exports.selectUsers = () => {
+  return db.query("SELECT * FROM users;").then((result) => result.rows);
+};

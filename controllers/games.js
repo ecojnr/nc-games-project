@@ -39,3 +39,12 @@ exports.postComment = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getUsers = (req, res, next) => {
+  models
+    .selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch(next);
+};

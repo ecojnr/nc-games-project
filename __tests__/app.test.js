@@ -142,7 +142,7 @@ describe("4: GET /api/:review_id/comments", () => {
   });
 });
 
-describe.only("5: POST /api/reviews/:review_id/comments", () => {
+describe("5: POST /api/reviews/:review_id/comments", () => {
   test("status: 201, responds with newly added comment", () => {
     const newComment = {
       body: "Test Comment",
@@ -198,6 +198,27 @@ describe.only("5: POST /api/reviews/:review_id/comments", () => {
       .expect(400)
       .then((result) => {
         expect(result.body.msg).toBe(`Review ID or votes is not a number`);
+      });
+  });
+});
+
+describe("6: GET /api/users", () => {
+  test.only("status:200, responds with an array of users ", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
       });
   });
 });
