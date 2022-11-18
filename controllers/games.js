@@ -22,8 +22,20 @@ exports.getReviewById = (req, res, next) => {
     .catch(next);
 };
 
-exports.getCommentsByReview = (req, res) => {
-  models.selectCommentsByReview(req.params.review_id).then((comments) => {
-    res.status(200).send({ comments });
-  });
+exports.getCommentsByReview = (req, res, next) => {
+  models
+    .selectCommentsByReview(req.params.review_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+  models
+    .insertComment(req.body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
 };
