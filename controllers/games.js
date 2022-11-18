@@ -30,3 +30,12 @@ exports.getCommentsByReview = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.postComment = (req, res, next) => {
+  models
+    .insertComment(req.body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+};

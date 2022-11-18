@@ -2,7 +2,12 @@ const { expect } = require("@jest/globals");
 const request = require("supertest");
 const app = require("../app.js");
 const db = require("../db/connection");
+const seed = require("../db/seeds/seed");
+const devData = require("../db/data/development-data/index");
 
+beforeEach(() => {
+  return seed(devData);
+});
 afterAll(() => db.end());
 
 describe("1: GET /api/reviews", () => {
@@ -133,6 +138,66 @@ describe("4: GET /api/:review_id/comments", () => {
       .expect(400)
       .then((result) => {
         expect(result.body.msg).toBe(`Entered ID is not a number: asdasd`);
+      });
+  });
+});
+
+describe.only("5: POST /api/reviews/:review_id/comments", () => {
+  test("status: 201, responds with newly added comment", () => {
+    const newComment = {
+      body: "Test Comment",
+      review_id: 1,
+      created_at: new Date(),
+      votes: 3,
+      author: "cooljmessy",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          author: "cooljmessy",
+          body: "Test Comment",
+          created_at: expect.any(String),
+          review_id: 1,
+          votes: 3,
+          comment_id: expect.any(Number),
+        });
+      });
+  });
+  test("status: 400, responds with body is not a string", () => {
+    const newComment = {
+      body: 2,
+      review_id: 2,
+      created_at: new Date(),
+      votes: 3,
+      author: 2,
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(
+          `The body, time or author is not a string.`
+        );
+      });
+  });
+  test("status: 400, responds with review id is not a number", () => {
+    const newComment = {
+      body: "Test Comment",
+      review_id: "test",
+      created_at: new Date(),
+      votes: 3,
+      author: "cooljmessy",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(`Review ID or votes is not a number`);
       });
   });
 });
