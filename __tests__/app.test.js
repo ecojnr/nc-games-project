@@ -36,6 +36,27 @@ describe("1: GET /api/reviews", () => {
 			});
 	});
 });
+describe.only("/api/reviews/categories/euro", () => {
+	test("GET 200 - should return an object of the relevant reviews where the category is euro game", () => {
+		return request(app)
+			.get("/api/reviews/categories/strategy")
+			.expect(200)
+			.then((result) => {
+				result.body.reviews.forEach((review) => {
+					expect(review).toMatchObject({
+						review_id: expect.any(Number),
+						title: expect.any(String),
+						designer: expect.any(String),
+						owner: expect.any(String),
+						review_img_url: expect.any(String),
+						category: "strategy",
+						created_at: expect.any(String),
+						votes: expect.any(Number),
+					});
+				});
+			});
+	});
+});
 
 describe("2: GET /api/categories", () => {
 	test("status:200, responds with an array of categories", () => {
@@ -315,6 +336,38 @@ describe.only("7: PATCH /api/reviews/:review_id", () => {
 			.expect(400)
 			.then((result) => {
 				expect(result.body.msg).toBe(`Entered ID is not a number: two`);
+			});
+	});
+});
+
+describe("10: GET /api/reviews/:review_id/count", () => {
+	test.only("status:200, responds with an array of reviews containing correct object values ", () => {
+		return request(app)
+			.get("/api/reviews/1/count")
+			.expect(200)
+			.then(({ body }) => {
+				const { review } = body;
+				expect(review).toBeInstanceOf(Object);
+				expect(body.review).toEqual({
+					review_id: 1,
+					comment_count: "3",
+				});
+			});
+	});
+	test.only("status:400, responds with entered id is not a number ", () => {
+		return request(app)
+			.get(`/api/reviews/two/count`)
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe(`Entered ID is not a number: two`);
+			});
+	});
+	test.only("status:404, responds with no comments found for review 92", () => {
+		return request(app)
+			.get(`/api/reviews/92/count`)
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe(`No comments found for review_id: 92`);
 			});
 	});
 });

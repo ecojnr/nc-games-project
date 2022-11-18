@@ -57,3 +57,12 @@ exports.upVote = (req, res, next) => {
 		})
 		.catch(next);
 };
+
+exports.getComments = (req, res, next) => {
+	models
+		.selectreviewComments(req.params.review_id)
+		.then((review) => {
+			res.status(200).send({ review });
+		})
+		.catch(next);
+};
