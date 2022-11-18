@@ -2,7 +2,12 @@ const { expect } = require("@jest/globals");
 const request = require("supertest");
 const app = require("../app.js");
 const db = require("../db/connection");
+const seed = require("../db/seeds/seed");
+const devData = require("../db/data/development-data/index");
 
+beforeEach(() => {
+  return seed(devData);
+});
 afterAll(() => db.end());
 
 describe("1: GET /api/reviews", () => {
@@ -94,7 +99,7 @@ describe("3: GET /api/reviews/review_id", () => {
   });
 });
 
-/*describe("4: GET /api/:review_id/comments", () => {
+describe("4: GET /api/:review_id/comments", () => {
   test("status:200, responds with an array of comments", () => {
     const review_id = 1;
     return request(app)
@@ -103,21 +108,117 @@ describe("3: GET /api/reviews/review_id", () => {
       .then(({ body }) => {
         const { comments } = body;
         expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(3);
         comments.forEach((comment) => {
           expect(comment).toEqual(
             expect.objectContaining({
-              title: expect.any(String),
-              designer: expect.any(String),
-              owner: expect.any(String),
-              review_img_url: expect.any(String),
-              review_id: expect.any(Number),
-              category: expect.any(String),
+              body: expect.any(String),
+              review_id: 1,
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              author: expect.any(String),
+              comment_id: expect.any(Number),
             })
           );
         });
       });
   });
-});*/
+  test("status:404, responds with an error stating no review found for given id", () => {
+    const review_id = 400;
+    return request(app)
+      .get(`/api/reviews/${review_id}/comments`)
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe(`No comments found for review_id: 400`);
+      });
+  });
+  test("status:400, responds with an error stating review id is not a number", () => {
+    return request(app)
+      .get("/api/reviews/asdasd/comments")
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(`Entered ID is not a number: asdasd`);
+      });
+  });
+});
+
+describe("5: POST /api/reviews/:review_id/comments", () => {
+  test("status: 201, responds with newly added comment", () => {
+    const newComment = {
+      body: "Test Comment",
+      review_id: 1,
+      created_at: new Date(),
+      votes: 3,
+      author: "cooljmessy",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          author: "cooljmessy",
+          body: "Test Comment",
+          created_at: expect.any(String),
+          review_id: 1,
+          votes: 3,
+          comment_id: expect.any(Number),
+        });
+      });
+  });
+  test("status: 400, responds with body is not a string", () => {
+    const newComment = {
+      body: 2,
+      review_id: 2,
+      created_at: new Date(),
+      votes: 3,
+      author: 2,
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(
+          `The body, time or author is not a string.`
+        );
+      });
+  });
+  test("status: 400, responds with review id is not a number", () => {
+    const newComment = {
+      body: "Test Comment",
+      review_id: "test",
+      created_at: new Date(),
+      votes: 3,
+      author: "cooljmessy",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe(`Review ID or votes is not a number`);
+      });
+  });
+});
+
+describe("6: GET /api/users", () => {
+  test.only("status:200, responds with an array of users ", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});

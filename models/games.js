@@ -41,5 +41,42 @@ exports.selectCommentsByReview = (id) => {
   }
   return db
     .query("SELECT * FROM comments WHERE review_id = $1;", [id])
-    .then((reviews) => reviews.rows);
+    .then((result) => {
+      const comments = result.rows;
+      if (comments.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No comments found for review_id: ${id}`,
+        });
+      }
+      return comments;
+    });
+};
+
+exports.insertComment = (newComment) => {
+  const { body, review_id, created_at, votes, author } = newComment;
+
+  if (!(typeof review_id === "number" && typeof votes === "number")) {
+    return Promise.reject({
+      status: 400,
+      msg: `Review ID or votes is not a number`,
+    });
+  } else if (
+    typeof newComment.body !== "string" &&
+    typeof newComment.author !== "string"
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: `The body, time or author is not a string.`,
+    });
+  }
+  return db
+    .query(
+      "INSERT INTO comments (body, review_id, author, votes, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *;",
+      [body, review_id, author, votes, created_at]
+    )
+    .then(({ rows }) => rows[0]);
+};
+exports.selectUsers = () => {
+  return db.query("SELECT * FROM users;").then((result) => result.rows);
 };
