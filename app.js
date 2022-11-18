@@ -12,6 +12,7 @@ app.get("/api/reviews/:review_id", controllers.getReviewById);
 app.get("/api/reviews/:review_id/comments", controllers.getCommentsByReview);
 app.post("/api/reviews/:review_id/comments", controllers.postComment);
 app.get("/api/users", controllers.getUsers);
+app.patch("/api/reviews/:review_id", controllers.upVote);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });

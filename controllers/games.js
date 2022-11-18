@@ -48,3 +48,12 @@ exports.getUsers = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.upVote = (req, res, next) => {
+  models
+    .updateVotebyNumber(req.params.review_id, req.body)
+    .then((review) => {
+      res.status(200).send({ review });
+    })
+    .catch(next);
+};

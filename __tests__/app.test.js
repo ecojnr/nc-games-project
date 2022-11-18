@@ -203,7 +203,7 @@ describe("5: POST /api/reviews/:review_id/comments", () => {
 });
 
 describe("6: GET /api/users", () => {
-  test.only("status:200, responds with an array of users ", () => {
+  test("status:200, responds with an array of users ", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
@@ -219,6 +219,21 @@ describe("6: GET /api/users", () => {
             })
           );
         });
+      });
+  });
+});
+
+describe.only("7: PATCH /api/reviews/:review_id", () => {
+  test("status: 200, responds with new number of votes for comment", () => {
+    const reviewUpdates = {
+      votes: 3,
+    };
+    return request(app)
+      .patch("/api/reviews/1")
+      .send(reviewUpdates)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.park).toEqual({ votes: 4 });
       });
   });
 });

@@ -80,3 +80,14 @@ exports.insertComment = (newComment) => {
 exports.selectUsers = () => {
   return db.query("SELECT * FROM users;").then((result) => result.rows);
 };
+
+exports.updateVotebyNumber = (review_id, newInfo) => {
+  const { votes } = newInfo;
+  return db
+    .query("SELECT votes FROM reviews WHERE review_id = $1;", [review_id])
+    .then((result) => {
+      const review_votes = result.rows[0].votes;
+      const new_review_votes = review_votes + newInfo.votes;
+      console.log(new_review_votes);
+    });
+};
